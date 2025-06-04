@@ -2,11 +2,11 @@
 // This file is executed before each test file
 
 // Set test environment variables
-process.env.NODE_ENV = "test";
-process.env.DYNAMODB_TABLE_NAME = "contacts-test";
-process.env.USE_LOCAL_DYNAMODB = "true";
-process.env.DYNAMODB_ENDPOINT = "http://localhost:8000";
-process.env.LOG_LEVEL = "error"; // Reduce log noise during tests
+process.env["NODE_ENV"] = "test";
+process.env["DYNAMODB_TABLE_NAME"] = "contacts-test";
+process.env["USE_LOCAL_DYNAMODB"] = "true";
+process.env["DYNAMODB_ENDPOINT"] = "http://localhost:8000";
+process.env["LOG_LEVEL"] = "error"; // Reduce log noise during tests
 
 // Mock console methods to reduce test output noise
 const originalConsole = { ...console };

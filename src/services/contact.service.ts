@@ -4,7 +4,6 @@ import {
   Contact,
   IdentifyRequest,
   ConsolidatedContact,
-  LinkPrecedence,
   DbOperationResult,
 } from "../types/contact.types";
 

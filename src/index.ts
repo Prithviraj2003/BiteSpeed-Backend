@@ -75,7 +75,7 @@ async function createApp(): Promise<express.Application> {
   );
 
   // Root endpoint
-  app.get("/", (req, res) => {
+  app.get("/", (_req, res) => {
     res.json({
       success: true,
       message: "BiteSpeed Identity Reconciliation API",

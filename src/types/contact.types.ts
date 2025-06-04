@@ -1,4 +1,4 @@
-export type LinkPrecedence = 'primary' | 'secondary';
+export type LinkPrecedence = "primary" | "secondary";
 
 /**
  * Contact model representing a customer contact in DynamoDB
@@ -65,4 +65,13 @@ export interface UpdateContactParams {
   linkedId?: string;
   linkPrecedence?: LinkPrecedence;
   updatedAt: string;
-} 
+}
+
+/**
+ * Database operation result
+ */
+export interface DbOperationResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}

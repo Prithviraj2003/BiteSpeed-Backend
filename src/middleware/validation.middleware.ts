@@ -18,7 +18,7 @@ const identifySchema = Joi.object({
  * Middleware to validate request body against a Joi schema
  */
 export function validateRequest(schema: Joi.ObjectSchema) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
@@ -34,11 +34,12 @@ export function validateRequest(schema: Joi.ObjectSchema) {
         path: req.path,
       });
 
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: "Validation failed",
         message: errorMessage,
       });
+      return;
     }
 
     // Replace request body with validated and sanitized data
