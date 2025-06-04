@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -58,7 +58,7 @@ class WebSocketService {
 /**
  * Initialize and configure Express application
  */
-async function createApp(): Promise<{ app: express.Application; server: any }> {
+async function createApp(): Promise<{ app: Application; server: any }> {
   const app = express();
   const server = createServer(app);
 
@@ -152,7 +152,7 @@ async function createApp(): Promise<{ app: express.Application; server: any }> {
   );
 
   // Test endpoint for WebSocket broadcasting
-  apiRouter.get("/test-websocket", (_req, res) => {
+  apiRouter.get("/test-websocket", (_req: Request, res: Response) => {
     const testLogEntry = {
       id: `test-${Date.now()}-${Math.random()}`,
       timestamp: new Date().toISOString(),
@@ -193,7 +193,7 @@ async function createApp(): Promise<{ app: express.Application; server: any }> {
   );
 
   // Root endpoint
-  app.get("/", (_req, res) => {
+  app.get("/", (_req: Request, res: Response) => {
     res.json({
       success: true,
       message: "BiteSpeed Identity Reconciliation API",
