@@ -370,6 +370,36 @@ export class ContactService {
       data: consolidatedContact,
     };
   }
+
+  /**
+   * Get all contacts from the database
+   */
+  async getAllContacts(): Promise<DbOperationResult<Contact[]>> {
+    try {
+      logger.info("Retrieving all contacts");
+
+      const result = await this.contactModel.getAllContacts();
+
+      if (!result.success) {
+        return {
+          success: false,
+          error: "Failed to retrieve contacts from database",
+        };
+      }
+
+      logger.info("Successfully retrieved all contacts", {
+        count: result.data?.length || 0,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error("Error retrieving all contacts", { error });
+      return {
+        success: false,
+        error: "Internal server error while retrieving contacts",
+      };
+    }
+  }
 }
 
 /**

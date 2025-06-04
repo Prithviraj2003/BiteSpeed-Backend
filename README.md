@@ -1,321 +1,215 @@
-# BiteSpeed Identity Reconciliation Backend
+# BiteSpeed Identity Reconciliation Frontend
 
-A robust backend service for identity reconciliation that helps e-commerce platforms link customer contacts across multiple purchases.
-
-## Problem Statement
-
-FluxKart.com customers like Dr. Emmett Brown use different email addresses and phone numbers for each purchase to maintain privacy. This backend service identifies and links these different contact entries to the same customer for personalized experience.
+A modern React dashboard for visualizing and testing the BiteSpeed Identity Reconciliation system. This frontend provides real-time visualization of contact relationships, API testing capabilities, and live log monitoring.
 
 ## Features
 
-- **Smart Contact Linking**: Links contacts based on shared email or phone numbers
-- **Primary/Secondary Precedence**: Maintains data hierarchy with oldest contact as primary
-- **RESTful API**: Clean `/identify` endpoint for contact reconciliation
-- **Scalable Architecture**: Built with Node.js, TypeScript, and DynamoDB
-- **Comprehensive Testing**: Full test suite covering all business scenarios
-- **Production Ready**: Proper logging, error handling, and security middleware
+🎯 **Real-time Contact Visualization**
+
+- Interactive graph showing contact relationships
+- Visual distinction between primary and secondary contacts
+- Animated connection lines showing linked relationships
+- Real-time updates when new contacts are added
+
+🔧 **API Testing Interface**
+
+- Test the `/identify` endpoint directly from the UI
+- Form validation and error handling
+- Response time monitoring
+- Detailed response visualization
+
+📊 **Live Log Monitoring**
+
+- Real-time log streaming via WebSocket
+- Log filtering by level (info, warn, error, debug)
+- Auto-scroll with manual override
+- Expandable log data inspection
+
+🎨 **Modern BiteSpeed Design**
+
+- Dark theme matching BiteSpeed branding
+- Smooth animations with Framer Motion
+- Responsive layout with Tailwind CSS
+- Professional dashboard interface
 
 ## Tech Stack
 
-- **Backend**: Node.js with TypeScript
-- **Database**: DynamoDB (AWS or Local)
-- **Framework**: Express.js
-- **Testing**: Jest
-- **Validation**: Joi
-- **Logging**: Winston
-- **Security**: Helmet, CORS, Rate Limiting
+- **React 19** with TypeScript
+- **Tailwind CSS** for styling
+- **React Flow** for graph visualization
+- **Framer Motion** for animations
+- **Lucide React** for icons
+- **Socket.IO Client** for real-time updates
+- **Axios** for API communication
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
-- DynamoDB Local (for development) or AWS account
+- Node.js 18+ and npm
+- Backend server running on port 3001
 
 ### Installation
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd bitespeed-identity-reconciliation
+1. **Install dependencies:**
 
-# Install dependencies
-npm install
+   ```bash
+   npm install
+   ```
 
-# Set up environment variables
-cp env.example .env
-# Edit .env with your configuration
+2. **Configure environment:**
+   Copy the environment variables:
 
-# Set up DynamoDB table
-npm run setup:db
+   ```bash
+   cp frontend.env .env.local
+   ```
 
-# Start the development server
-npm run dev
+3. **Start the development server:**
+   ```bash
+   npm start
+   ```
+
+The frontend will be available at `http://localhost:3000`
+
+### Environment Variables
+
+Create a `.env.local` file with:
+
 ```
-
-### Environment Configuration
-
-Create a `.env` file based on `env.example`:
-
-```env
-# Server Configuration
+REACT_APP_API_URL=http://localhost:3001/api
+REACT_APP_SOCKET_URL=http://localhost:3001
 PORT=3000
-NODE_ENV=development
-
-# AWS DynamoDB Configuration
-AWS_REGION=us-east-1
-# AWS_ACCESS_KEY_ID=your-access-key-id (for production)
-# AWS_SECRET_ACCESS_KEY=your-secret-access-key (for production)
-
-# DynamoDB Configuration
-DYNAMODB_TABLE_NAME=contacts
-DYNAMODB_ENDPOINT=http://localhost:8000
-USE_LOCAL_DYNAMODB=true
-
-# Logging
-LOG_LEVEL=info
-
-# Security
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-
-# CORS
-CORS_ORIGIN=*
 ```
 
-### Local Development with DynamoDB Local
+## Usage
 
-1. **Install DynamoDB Local:**
+### 1. API Testing
 
-   ```bash
-   # Using Docker (recommended)
-   docker run -p 8000:8000 amazon/dynamodb-local
+- **Left Panel**: Use the API test form to send requests to the `/identify` endpoint
+- Enter email and/or phone number
+- Click "Identify Contact" to see the response
+- View detailed response data including:
+  - Primary contact ID
+  - All linked emails and phone numbers
+  - Secondary contact IDs
 
-   # Or download and run locally
-   # Follow AWS DynamoDB Local documentation
-   ```
+### 2. Contact Visualization
 
-2. **Create the table:**
+- **Center Panel**: Interactive graph of contact relationships
+- **Primary contacts** appear in blue with crown icons
+- **Secondary contacts** appear in gray with user icons
+- **Connection lines** show linked relationships
+- Use controls to zoom, pan, and fit the view
+- Mini-map for navigation in large datasets
 
-   ```bash
-   npm run setup:db
-   ```
+### 3. Real-time Logs
 
-3. **Start the server:**
-   ```bash
-   npm run dev
-   ```
+- **Right Panel**: Live log monitoring
+- Filter logs by level using the dropdown
+- Toggle auto-scroll on/off
+- Click "Show data" on log entries to see detailed information
+- Clear logs with the trash button
 
-## API Documentation
+## Components
 
-### POST /identify
+### Core Components
 
-Main endpoint for contact identity reconciliation.
+- **`App.tsx`** - Main application component with state management
+- **`ApiTestForm.tsx`** - Form for testing API endpoints
+- **`ContactNode.tsx`** - Custom node component for React Flow
+- **`LogPanel.tsx`** - Real-time log display with filtering
 
-**Request:**
+### Services
 
-```json
-{
-  "email": "customer@example.com",
-  "phoneNumber": "123456789"
-}
-```
+- **`api.ts`** - API service with request/response logging
+- **`websocket.ts`** - WebSocket service for real-time updates
 
-**Response:**
+### Types
 
-```json
-{
-  "contact": {
-    "primaryContactId": "uuid",
-    "emails": ["primary@example.com", "secondary@example.com"],
-    "phoneNumbers": ["123456789"],
-    "secondaryContactIds": ["uuid1", "uuid2"]
-  }
-}
-```
+- **`types/index.ts`** - TypeScript interfaces for all data models
 
-For detailed API documentation, see [API.md](./API.md).
+## Features in Detail
+
+### Contact Relationships Visualization
+
+The graph automatically layouts contacts showing:
+
+- Primary contacts as the main nodes
+- Secondary contacts connected to their primary
+- Email and phone number information on each node
+- Creation and update timestamps
+- Visual indicators for recently added contacts
+
+### Real-time Updates
+
+When API calls are made:
+
+1. New contacts appear in the graph with animation
+2. Relationship lines are drawn automatically
+3. Logs are updated in real-time
+4. Connection status is monitored
+
+### Responsive Design
+
+- Three-panel layout: API testing | Visualization | Logs
+- Panels are sized appropriately for different screen sizes
+- Modern dark theme with blue accents
+- Smooth transitions and hover effects
 
 ## Development
+
+### Available Scripts
+
+- `npm start` - Start development server
+- `npm build` - Build for production
+- `npm test` - Run tests
+- `npm eject` - Eject from Create React App
 
 ### Project Structure
 
 ```
 src/
-├── controllers/     # HTTP request handlers
-├── services/        # Business logic
-├── models/          # Data access layer
-├── database/        # Database configuration
-├── middleware/      # Express middleware
-├── utils/           # Utility functions
-├── types/           # TypeScript type definitions
-└── scripts/         # Database setup scripts
-
-tests/               # Test files
+├── components/          # React components
+│   ├── ApiTestForm.tsx
+│   ├── ContactNode.tsx
+│   └── LogPanel.tsx
+├── services/           # API and WebSocket services
+│   ├── api.ts
+│   └── websocket.ts
+├── types/              # TypeScript definitions
+│   └── index.ts
+├── App.tsx             # Main application
+├── index.tsx           # Entry point
+└── index.css           # Global styles with Tailwind
 ```
 
-### Available Scripts
+## Integration with Backend
 
-```bash
-# Development
-npm run dev          # Start development server with hot reload
-npm run build        # Build TypeScript to JavaScript
-npm start           # Start production server
+This frontend is designed to work with the BiteSpeed Identity Reconciliation backend:
 
-# Testing
-npm test            # Run all tests
-npm run test:watch  # Run tests in watch mode
-npm run test:coverage # Run tests with coverage report
+- **API Endpoint**: `POST /api/identify`
+- **WebSocket**: For real-time log streaming (optional)
+- **Health Check**: `GET /api/health`
 
-# Database
-npm run setup:db    # Create DynamoDB table
+The frontend gracefully handles backend unavailability and provides appropriate feedback.
 
-# Code Quality
-npm run lint        # Run ESLint
-npm run lint:fix    # Fix ESLint issues
-npm run format      # Format code with Prettier
-```
+## Styling
 
-### Testing
+The application uses a custom Tailwind configuration with:
 
-The project includes comprehensive tests covering all business scenarios:
-
-```bash
-# Run all tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode (for development)
-npm run test:watch
-```
-
-Test coverage includes:
-
-- All PRD scenarios (new contacts, secondary creation, primary linking)
-- Edge cases and error handling
-- Input validation
-- Database error scenarios
-
-## Deployment
-
-### Production Environment Variables
-
-For production deployment, set these environment variables:
-
-```env
-NODE_ENV=production
-PORT=3000
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-production-access-key
-AWS_SECRET_ACCESS_KEY=your-production-secret-key
-DYNAMODB_TABLE_NAME=contacts-prod
-USE_LOCAL_DYNAMODB=false
-LOG_LEVEL=info
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-CORS_ORIGIN=https://yourdomain.com
-```
-
-### Deployment Options
-
-#### 1. Render.com (Recommended for Demo)
-
-1. Connect your GitHub repository to Render
-2. Set environment variables in Render dashboard
-3. Deploy with build command: `npm run build`
-4. Start command: `npm start`
-
-#### 2. AWS Lambda + API Gateway
-
-1. Use AWS SAM or Serverless Framework
-2. Configure DynamoDB permissions
-3. Deploy with appropriate IAM roles
-
-#### 3. Traditional VPS/Container
-
-1. Build the application: `npm run build`
-2. Set production environment variables
-3. Start with PM2 or similar process manager
-4. Configure reverse proxy (nginx)
-
-### Database Setup in Production
-
-The application will automatically create the DynamoDB table if it doesn't exist. Ensure your AWS credentials have the necessary permissions:
-
-- `dynamodb:CreateTable`
-- `dynamodb:DescribeTable`
-- `dynamodb:PutItem`
-- `dynamodb:GetItem`
-- `dynamodb:UpdateItem`
-- `dynamodb:Scan`
-- `dynamodb:Query`
-
-## Performance Considerations
-
-- **Database Indexing**: Uses Global Secondary Indexes for efficient email/phone lookups
-- **Connection Pooling**: Optimized DynamoDB client configuration
-- **Rate Limiting**: Prevents abuse with configurable limits
-- **Logging**: Structured logging for monitoring and debugging
-- **Error Handling**: Graceful error handling with proper HTTP status codes
-
-## Monitoring and Logging
-
-The application provides comprehensive logging:
-
-- **Request/Response Logging**: All API calls with timing
-- **Business Logic Logging**: Contact creation and linking events
-- **Error Logging**: Detailed error information for debugging
-- **Health Checks**: `/health` endpoint for monitoring
-
-## Security Features
-
-- **Helmet**: Security headers
-- **CORS**: Configurable cross-origin resource sharing
-- **Rate Limiting**: Protection against abuse
-- **Input Validation**: Joi schema validation
-- **Error Sanitization**: No sensitive data in error responses
+- BiteSpeed blue color palette
+- Dark theme as default
+- Custom animations and transitions
+- Professional spacing and typography
 
 ## Contributing
 
-1. Make small, focused commits with clear messages
-2. Follow TypeScript best practices
-3. Add tests for new functionality
-4. Update documentation as needed
-5. Ensure all tests pass before submitting
-
-## Assignment Compliance
-
-This implementation fulfills all requirements from the BiteSpeed Backend Task:
-
-✅ **POST /identify endpoint** with exact response format  
-✅ **Contact linking logic** as specified in PRD  
-✅ **Primary/Secondary precedence** with oldest-contact-wins  
-✅ **All PRD scenarios** implemented and tested  
-✅ **TypeScript + Node.js** as requested  
-✅ **DynamoDB** for data persistence  
-✅ **Small, insightful commits** throughout development  
-✅ **Production-ready** with proper error handling  
-✅ **Hosted deployment** ready configuration
-
-## Live Demo
-
-🚀 **API Endpoint**: [Will be updated with deployment URL]
-
-**Test the API:**
-
-```bash
-curl -X POST https://your-deployment-url/identify \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","phoneNumber":"123456789"}'
-```
+1. Follow the existing code style
+2. Add TypeScript types for new features
+3. Test API integration thoroughly
+4. Ensure responsive design principles
+5. Add appropriate animations for new interactions
 
 ## License
 
-This project is part of the BiteSpeed Backend Assignment.
-
----
-
-Built with ❤️ for BiteSpeed Interview Process
+MIT License - see LICENSE file for details

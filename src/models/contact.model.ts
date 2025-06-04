@@ -16,11 +16,35 @@ import {
   DbOperationResult,
 } from "../types/contact.types";
 
+// In-memory storage for demo mode when DynamoDB is not available
+const inMemoryContacts: Contact[] = [];
+
 export class ContactModel {
   private tableName: string;
+  private useInMemory: boolean = false;
 
   constructor() {
     this.tableName = config.dynamodb.tableName;
+  }
+
+  private async executeWithFallback<T>(
+    dynamoOperation: () => Promise<T>,
+    inMemoryOperation: () => T
+  ): Promise<T> {
+    if (this.useInMemory) {
+      return inMemoryOperation();
+    }
+
+    try {
+      return await dynamoOperation();
+    } catch (error) {
+      logger.warn(
+        "DynamoDB operation failed, falling back to in-memory storage",
+        { error }
+      );
+      this.useInMemory = true;
+      return inMemoryOperation();
+    }
   }
 
   /**
@@ -49,14 +73,24 @@ export class ContactModel {
         contact.linkedId = params.linkedId;
       }
 
-      await docClient.send(
-        new PutCommand({
-          TableName: this.tableName,
-          Item: contact,
-        })
+      await this.executeWithFallback(
+        async () => {
+          await docClient.send(
+            new PutCommand({
+              TableName: this.tableName,
+              Item: contact,
+            })
+          );
+        },
+        () => {
+          inMemoryContacts.push(contact);
+        }
       );
 
-      logger.info("Contact created successfully", { contactId: contact.id });
+      logger.info("Contact created successfully", {
+        contactId: contact.id,
+        storage: this.useInMemory ? "in-memory" : "dynamodb",
+      });
       return { success: true, data: contact };
     } catch (error) {
       logger.error("Failed to create contact", { error, params });
@@ -218,6 +252,42 @@ export class ContactModel {
         primaryContactId,
       });
       return { success: false, error: "Failed to get linked contacts" };
+    }
+  }
+
+  /**
+   * Get all contacts from the database
+   */
+  async getAllContacts(): Promise<DbOperationResult<Contact[]>> {
+    try {
+      const contacts = await this.executeWithFallback(
+        async () => {
+          const result = await docClient.send(
+            new ScanCommand({
+              TableName: this.tableName,
+            })
+          );
+          return result.Items ? (result.Items as Contact[]) : [];
+        },
+        () => {
+          return [...inMemoryContacts];
+        }
+      );
+
+      // Sort by creation date (newest first)
+      contacts.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      logger.info("Retrieved all contacts", {
+        count: contacts.length,
+        storage: this.useInMemory ? "in-memory" : "dynamodb",
+      });
+      return { success: true, data: contacts };
+    } catch (error) {
+      logger.error("Failed to get all contacts", { error });
+      return { success: false, error: "Failed to get all contacts" };
     }
   }
 }

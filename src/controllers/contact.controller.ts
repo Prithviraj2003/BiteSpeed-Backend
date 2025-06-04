@@ -79,4 +79,48 @@ export class ContactController {
       version: "1.0.0",
     });
   }
+
+  /**
+   * Get all contacts endpoint
+   */
+  async getAllContacts(_req: Request, res: Response): Promise<void> {
+    try {
+      logger.info("Received get all contacts request");
+
+      const result = await this.contactService.getAllContacts();
+
+      if (!result.success) {
+        logger.warn("Failed to retrieve contacts", {
+          error: result.error,
+        });
+
+        res.status(500).json({
+          success: false,
+          error: result.error,
+          message: "Failed to retrieve contacts",
+        } as ApiResponse);
+        return;
+      }
+
+      logger.info("Successfully retrieved contacts", {
+        count: result.data?.length || 0,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        count: result.data?.length || 0,
+      });
+    } catch (error) {
+      logger.error("Unexpected error in getAllContacts controller", {
+        error,
+      });
+
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        message: "An unexpected error occurred while retrieving contacts",
+      } as ApiResponse);
+    }
+  }
 }
